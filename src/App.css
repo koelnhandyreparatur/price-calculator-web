@@ -72,10 +72,13 @@ button[disabled] {
 .product-list-container {
   overflow-x: auto;
   max-width: 100vw;
+  box-sizing: border-box;
 }
 
 .product-table {
   width: 100%;
+  min-width: 600px;
+  table-layout: fixed;
   border-collapse: collapse;
   margin-top: 0;
   background: #fff;
@@ -128,4 +131,9 @@ body, .App {
 /* Remove box-shadow on hover for table rows */
 .product-table tr {
   transition: none;
+}
+
+.product-table td {
+  word-break: break-word;
+  max-width: 200px;
 }
