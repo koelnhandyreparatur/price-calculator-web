@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 
-const PRODUCTS_API = '/api/products'
-const PRICE_API = '/api/price?product_id='
+const isProd = window.location.hostname === 'app.koelnhandyreparatur.de';
+const PRODUCTS_API = isProd
+  ? 'https://api.koelnhandyreparatur.de/products'
+  : '/api/products';
+const PRICE_API = isProd
+  ? 'https://api.koelnhandyreparatur.de/price?product_id='
+  : '/api/price?product_id=';
 const PLACEHOLDER_IMG = '/images/placeholder.jpg'
 
 function App() {
