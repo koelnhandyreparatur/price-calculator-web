@@ -24,7 +24,7 @@ function App() {
   const [sortBy, setSortBy] = useState('name')
   const [sortDir, setSortDir] = useState('asc')
   const [filterName, setFilterName] = useState('')
-  const [filterAswoId, setFilterAswoId] = useState('')
+  const [filterId, setFilterId] = useState('')
 
   useEffect(() => {
     setFetchingProducts(true)
@@ -35,13 +35,13 @@ function App() {
       .finally(() => setFetchingProducts(false))
   }, [])
 
-  const handleCreateOffer = async (aswoId) => {
+  const handleCreateOffer = async (id) => {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${PRICE_API}${aswoId}`)
+      const res = await fetch(`${PRICE_API}${id}`)
       const data = await res.json()
-      setPrices((prev) => ({ ...prev, [aswoId]: data.price }))
+      setPrices((prev) => ({ ...prev, [id]: data }))
     } catch (err) {
       setError('Failed to fetch price')
     } finally {
@@ -51,13 +51,16 @@ function App() {
 
   // Helper to handle image fallback
   const handleImgError = (e) => {
-    e.target.src = PLACEHOLDER_IMG
+    if (!e.target.src.endsWith(PLACEHOLDER_IMG)) {
+      e.target.src = PLACEHOLDER_IMG;
+      e.target.onerror = null;
+    }
   }
 
   // Filtering
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(filterName.toLowerCase()) &&
-    product.aswoId.toLowerCase().includes(filterAswoId.toLowerCase())
+    String(product.id).toLowerCase().includes(filterId.toLowerCase())
   )
 
   // Sorting
@@ -105,8 +108,8 @@ function App() {
               <th style={{ cursor: 'pointer' }} onClick={() => handleSort('name')}>
                 Name {sortBy === 'name' ? (sortDir === 'asc' ? '▲' : '▼') : ''}
               </th>
-              <th style={{ cursor: 'pointer' }} onClick={() => handleSort('aswoId')}>
-                aswoId {sortBy === 'aswoId' ? (sortDir === 'asc' ? '▲' : '▼') : ''}
+              <th style={{ cursor: 'pointer' }} onClick={() => handleSort('id')}>
+                ID {sortBy === 'id' ? (sortDir === 'asc' ? '▲' : '▼') : ''}
               </th>
               <th>Offer</th>
               <th>Price</th>
@@ -125,9 +128,9 @@ function App() {
               <th>
                 <input
                   type="text"
-                  placeholder="Filter by aswoId"
-                  value={filterAswoId}
-                  onChange={e => { setFilterAswoId(e.target.value); setPage(1); }}
+                  placeholder="Filter by ID"
+                  value={filterId}
+                  onChange={e => { setFilterId(e.target.value); setPage(1); }}
                   style={{ width: '90%' }}
                 />
               </th>
@@ -137,23 +140,32 @@ function App() {
           </thead>
           <tbody>
             {pagedProducts.map((product) => (
-              <tr key={product.aswoId}>
+              <tr key={product.id}>
                 <td>
                   <img
-                    src={`/images/${product.aswoId}.jpg`}
-                    alt={product.name}
+                    src={`/images/${product.id}.jpg`}
+                    alt={product.name || 'Product thumbnail'}
                     className="product-img"
                     onError={handleImgError}
+                    loading="lazy"
                   />
                 </td>
                 <td>{product.name}</td>
-                <td>{product.aswoId}</td>
+                <td>{product.id}</td>
                 <td>
-                  <button onClick={() => handleCreateOffer(product.aswoId)} disabled={loading}>
+                  <button onClick={() => handleCreateOffer(product.id)} disabled={loading}>
                     {loading ? 'Loading...' : 'Create New Offer'}
                   </button>
                 </td>
-                <td>{prices[product.aswoId] ? prices[product.aswoId] : '-'}</td>
+                <td>
+                  {prices[product.id]
+                    ? <div>
+                        <div>Customer: {prices[product.id].customer_price}€</div>
+                        <div>Dealer: {prices[product.id].dealer_price}€</div>
+                        <div>Provider: {prices[product.id].provider}</div>
+                      </div>
+                    : '-'}
+                </td>
               </tr>
             ))}
           </tbody>
