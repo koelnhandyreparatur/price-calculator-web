@@ -105,11 +105,11 @@ function App() {
           <thead>
             <tr>
               <th>Image</th>
-              <th style={{ cursor: 'pointer' }} onClick={() => handleSort('name')}>
-                Name {sortBy === 'name' ? (sortDir === 'asc' ? '▲' : '▼') : ''}
-              </th>
               <th style={{ cursor: 'pointer' }} onClick={() => handleSort('id')}>
                 ID {sortBy === 'id' ? (sortDir === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th style={{ cursor: 'pointer' }} onClick={() => handleSort('name')}>
+                Name {sortBy === 'name' ? (sortDir === 'asc' ? '▲' : '▼') : ''}
               </th>
               <th>Offer</th>
               <th>Price</th>
@@ -119,18 +119,18 @@ function App() {
               <th>
                 <input
                   type="text"
-                  placeholder="Filter by name"
-                  value={filterName}
-                  onChange={e => { setFilterName(e.target.value); setPage(1); }}
+                  placeholder="Filter by ID"
+                  value={filterId}
+                  onChange={e => { setFilterId(e.target.value); setPage(1); }}
                   style={{ width: '90%' }}
                 />
               </th>
               <th>
                 <input
                   type="text"
-                  placeholder="Filter by ID"
-                  value={filterId}
-                  onChange={e => { setFilterId(e.target.value); setPage(1); }}
+                  placeholder="Filter by name"
+                  value={filterName}
+                  onChange={e => { setFilterName(e.target.value); setPage(1); }}
                   style={{ width: '90%' }}
                 />
               </th>
@@ -150,8 +150,8 @@ function App() {
                     loading="lazy"
                   />
                 </td>
-                <td>{product.name}</td>
                 <td>{product.id}</td>
+                <td>{product.name}</td>
                 <td>
                   <button onClick={() => handleCreateOffer(product.id)} disabled={loading}>
                     {loading ? 'Loading...' : 'Create New Offer'}
