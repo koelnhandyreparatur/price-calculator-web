@@ -1,5 +1,6 @@
 #root {
-  max-width: 1280px;
+  max-width: 768px;
+  width: 50%;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -126,6 +127,8 @@ button[disabled] {
 body, .App {
   background: #f7f7f7;
   color: #222;
+  width: 100%;
+  margin: 0 auto;
 }
 
 /* Remove box-shadow on hover for table rows */

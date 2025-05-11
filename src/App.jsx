@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import './App.css'
+import logo from '/images/logo.png';
 
 const isProd = window.location.hostname === 'app.koelnhandyreparatur.de';
 const PRODUCTS_API = isProd
@@ -18,6 +19,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [fetchingProducts, setFetchingProducts] = useState(false)
+  const [modalImg, setModalImg] = useState(null)
 
   // Paging, sorting, filtering state
   const [page, setPage] = useState(1)
@@ -95,31 +97,41 @@ function App() {
 
   return (
     <div className="App">
-      <header className="header">
-        <h1>Phone Parts Price Calculator</h1>
+      <header className="header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '1rem' }}>
+        <a href="https://koelnhandyreparatur.de/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block' }}>
+          <img src={logo} alt="Köln Handyreparatur Logo" style={{ height: '70px', verticalAlign: 'middle' }} />
+        </a>
+        <h1 style={{ margin: 0 }}>Ersatzteil Preisrechner</h1>
       </header>
       {error && <div className="error">{error}</div>}
-      {fetchingProducts && <div className="loading">Loading products...</div>}
+      {fetchingProducts && <div className="loading">Produkte werden geladen...</div>}
       <div className="product-list-container">
         <table className="product-table">
+          <colgroup>
+            <col style={{ width: '15%' }} />
+            <col style={{ width: '15%' }} />
+            <col />
+            <col />
+            <col />
+          </colgroup>
           <thead>
             <tr>
-              <th>Image</th>
+              <th>Bild</th>
               <th style={{ cursor: 'pointer' }} onClick={() => handleSort('id')}>
                 ID {sortBy === 'id' ? (sortDir === 'asc' ? '▲' : '▼') : ''}
               </th>
               <th style={{ cursor: 'pointer' }} onClick={() => handleSort('name')}>
                 Name {sortBy === 'name' ? (sortDir === 'asc' ? '▲' : '▼') : ''}
               </th>
-              <th>Offer</th>
-              <th>Price</th>
+              <th>Angebot</th>
+              <th>Preis</th>
             </tr>
             <tr>
               <th></th>
               <th>
                 <input
                   type="text"
-                  placeholder="Filter by ID"
+                  placeholder="ID filtern"
                   value={filterId}
                   onChange={e => { setFilterId(e.target.value); setPage(1); }}
                   style={{ width: '90%' }}
@@ -128,7 +140,7 @@ function App() {
               <th>
                 <input
                   type="text"
-                  placeholder="Filter by name"
+                  placeholder="Name filtern"
                   value={filterName}
                   onChange={e => { setFilterName(e.target.value); setPage(1); }}
                   style={{ width: '90%' }}
@@ -144,25 +156,27 @@ function App() {
                 <td>
                   <img
                     src={`/images/${product.id}.jpg`}
-                    alt={product.name || 'Product thumbnail'}
+                    alt={product.name || 'Produktbild'}
                     className="product-img"
                     onError={handleImgError}
                     loading="lazy"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => setModalImg(`/images/${product.id}.jpg`)}
                   />
                 </td>
                 <td>{product.id}</td>
                 <td>{product.name}</td>
                 <td>
                   <button onClick={() => handleCreateOffer(product.id)} disabled={loading}>
-                    {loading ? 'Loading...' : 'Create New Offer'}
+                    {loading ? 'Lädt...' : 'Neues Angebot erstellen'}
                   </button>
                 </td>
                 <td>
                   {prices[product.id]
                     ? <div>
-                        <div>Customer: {prices[product.id].customer_price}€</div>
-                        <div>Dealer: {prices[product.id].dealer_price}€</div>
-                        <div>Provider: {prices[product.id].provider}</div>
+                        <div>Kunde: {prices[product.id].customer_price}€</div>
+                        <div>Händler: {prices[product.id].dealer_price}€</div>
+                        <div>Anbieter: {prices[product.id].provider}</div>
                       </div>
                     : '-'}
                 </td>
@@ -171,11 +185,40 @@ function App() {
           </tbody>
         </table>
         <div className="pagination" style={{ marginTop: '1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}>
-          <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>&lt; Prev</button>
-          <span>Page {page} of {totalPages}</span>
-          <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>Next &gt;</button>
+          <button onClick={() => handlePageChange(page - 1)} disabled={page === 1}>&lt; Zurück</button>
+          <span>Seite {page} von {totalPages}</span>
+          <button onClick={() => handlePageChange(page + 1)} disabled={page === totalPages}>Weiter &gt;</button>
         </div>
       </div>
+      {modalImg && (
+        <div
+          className="modal-backdrop"
+          onClick={() => setModalImg(null)}
+          style={{
+            position: 'fixed',
+            top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.7)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+        >
+          <img
+            src={modalImg}
+            alt="Großes Bild"
+            style={{
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              borderRadius: '10px',
+              background: '#fff',
+              padding: '10px'
+            }}
+            onClick={e => e.stopPropagation()}
+            onError={handleImgError}
+          />
+        </div>
+      )}
     </div>
   )
 }
