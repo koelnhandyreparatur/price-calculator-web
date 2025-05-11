@@ -144,3 +144,66 @@ body, .App {
   word-break: break-word;
   max-width: 200px;
 }
+
+.product-list-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.product-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 1.5rem 1rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 340px;
+}
+
+.product-img-large {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  background: #fafafa;
+  margin-bottom: 1rem;
+}
+
+.product-name {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.product-price-info {
+  margin-top: 0.5rem;
+  font-size: 0.98rem;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .product-list-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .product-list-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .product-card {
+    min-height: 260px;
+    padding: 1rem 0.5rem;
+  }
+  .product-img-large {
+    width: 100px;
+    height: 100px;
+  }
+}
