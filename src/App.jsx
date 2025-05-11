@@ -139,6 +139,13 @@ function App() {
     newSelected[level] = value;
     setSelectedCategories(newSelected);
     setPage(1);
+    // Scroll to top of filter bar for better UX
+    setTimeout(() => {
+      const filterBar = document.querySelector('.filter-bar');
+      if (filterBar) {
+        filterBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 0);
   };
 
   // Helper to get children for a given level
@@ -160,21 +167,18 @@ function App() {
         </a>
         <h1 style={{ margin: 0 }}>Ersatzteil Preisrechner</h1>
       </header>
-      <form onSubmit={handleSearch} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', justifyContent: 'center' }}>
+      <div className="filter-bar">
         <input
           type="text"
           placeholder="Produkte suchen..."
           value={searchInput}
           onChange={e => setSearchInput(e.target.value)}
-          style={{ padding: '0.5rem 1rem', fontSize: '1rem', borderRadius: '5px', border: '1px solid #ccc', minWidth: '200px' }}
+          onKeyDown={e => { if (e.key === 'Enter') { handleSearch(e); } }}
         />
-        <button type="submit" style={{ padding: '0.5rem 1.2rem' }}>Suchen</button>
+        <button type="button" onClick={handleSearch}>Suchen</button>
         {searchTerm && (
-          <button type="button" onClick={handleClearSearch} style={{ padding: '0.5rem 1.2rem', background: '#eee', color: '#333', border: '1px solid #ccc' }}>Zurücksetzen</button>
+          <button type="button" onClick={handleClearSearch}>Zurücksetzen</button>
         )}
-      </form>
-      {/* Category dropdowns */}
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
         {Array.from({ length: 4 }).map((_, level) => {
           const options = getCategoryChildren(level);
           if (!options.length) return null;
@@ -183,7 +187,6 @@ function App() {
               key={level}
               value={selectedCategories[level] || ''}
               onChange={e => handleCategoryChange(level, e.target.value)}
-              style={{ padding: '0.5rem 1rem', borderRadius: '5px', border: '1px solid #ccc', minWidth: '180px' }}
             >
               <option value="">{level === 0 ? 'Kategorie wählen' : 'Unterkategorie wählen'}</option>
               {options.map(opt => (
