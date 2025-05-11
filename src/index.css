@@ -133,6 +133,8 @@ button:focus-visible {
 @media (max-width: 768px) {
   .App {
     padding: 1rem;
+    width: 100%;
+    max-width: 100%;
   }
   .product-table th, .product-table td {
     padding: 6px;
