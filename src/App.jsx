@@ -159,6 +159,14 @@ function App() {
     return node.children || [];
   };
 
+  // Helper to get minutes left until offer expires
+  const getMinutesLeft = (expireTimeMs) => {
+    const now = Date.now();
+    const diffMs = expireTimeMs - now;
+    if (diffMs <= 0) return 0;
+    return Math.ceil(diffMs / 60000);
+  };
+
   return (
     <div className="App">
       <header className="header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '1rem' }}>
@@ -222,6 +230,11 @@ function App() {
                       <div>Kunde: {prices[product.id].customer_price}€</div>
                       <div>Händler: {prices[product.id].dealer_price}€</div>
                       <div>Anbieter: {prices[product.id].provider}</div>
+                      {prices[product.id].expire_time_ms && (
+                        <div style={{ color: '#e67e22', fontWeight: 500, marginTop: 4 }}>
+                          Angebot läuft ab in {getMinutesLeft(prices[product.id].expire_time_ms)} Minuten
+                        </div>
+                      )}
                     </div>
                 : '-'}
             </div>
