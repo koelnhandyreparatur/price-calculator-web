@@ -179,7 +179,7 @@ function App() {
         {searchTerm && (
           <button type="button" onClick={handleClearSearch}>Zurücksetzen</button>
         )}
-        {Array.from({ length: 4 }).map((_, level) => {
+        {Array.from({ length: 5 }).map((_, level) => {
           const options = getCategoryChildren(level);
           if (!options.length) return null;
           return (
