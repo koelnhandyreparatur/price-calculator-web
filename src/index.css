@@ -57,7 +57,7 @@ button:focus-visible {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   width: 100%;
-  max-width: 1000px;
+  max-width: 1024px;
   margin: 0 auto;
   padding: 2rem;
 }
@@ -129,7 +129,7 @@ button:focus-visible {
   gap: 0.5rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .App {
     padding: 1rem;
     width: 100%;
