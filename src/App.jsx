@@ -12,7 +12,7 @@ const CATEGORIES_API = isProd
 const PRICE_API = isProd
   ? 'https://api.koelnhandyreparatur.de/price?product_id='
   : '/api/price?product_id=';
-const PLACEHOLDER_IMG = '/images/placeholder.jpg'
+const PLACEHOLDER_IMG = '/images/thumbnail.jpg'
 
 const PAGE_SIZE = 15; // 3 columns x 5 rows
 
