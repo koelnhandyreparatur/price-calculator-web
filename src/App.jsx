@@ -216,11 +216,13 @@ function App() {
             </button>
             <div className="product-price-info">
               {prices[product.id]
-                ? <div>
-                    <div>Kunde: {prices[product.id].customer_price}€</div>
-                    <div>Händler: {prices[product.id].dealer_price}€</div>
-                    <div>Anbieter: {prices[product.id].provider}</div>
-                  </div>
+                ? prices[product.id].error === 'No provider cost found for product id ' + product.id
+                  ? <div style={{ color: 'red', fontWeight: 'bold' }}>Out of stock!</div>
+                  : <div>
+                      <div>Kunde: {prices[product.id].customer_price}€</div>
+                      <div>Händler: {prices[product.id].dealer_price}€</div>
+                      <div>Anbieter: {prices[product.id].provider}</div>
+                    </div>
                 : '-'}
             </div>
           </div>
