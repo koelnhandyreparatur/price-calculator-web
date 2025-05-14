@@ -318,3 +318,43 @@ button:focus-visible,
 .filter-bar button[type="button"]:focus {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
+/* Add this at the end of the file for hamburger button styling */
+.category-menu-btn {
+  background: var(--primary-color) !important;
+  border: none;
+  padding: 0.5em;
+  margin-right: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 24px;
+}
+
+/* Remove these duplicate styles from App.css, as they are already in index.css */
+/*
+.category-menu {
+  position: fixed;
+  top: 0;
+  left: -340px;
+  width: 320px;
+  height: 100vh;
+  background: #fff;
+  box-shadow: 2px 0 16px rgba(44,62,80,0.13);
+  z-index: 2000;
+  transition: left 0.3s cubic-bezier(.4,0,.2,1);
+  overflow-y: auto;
+  padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+  border-right: 1px solid #e0e4ea;
+  display: block;
+}
+.category-menu.open {
+  left: 0;
+}
+.category-menu-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(44,62,80,0.18);
+  z-index: 1999;
+}
+*/

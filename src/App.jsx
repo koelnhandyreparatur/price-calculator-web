@@ -38,6 +38,9 @@ function App() {
   const [userType, setUserType] = useState('');
   const [password, setPassword] = useState('');
 
+  const [categoryMenuOpen, setCategoryMenuOpen] = useState(false);
+  const [categoryMenuStack, setCategoryMenuStack] = useState([]); // stack of category levels
+
   // Read URL parameters for userType and password on mount
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -187,30 +190,45 @@ function App() {
     setPage(1);
   };
 
-  // Category dropdown handlers
-  const handleCategoryChange = (level, value) => {
-    const newSelected = selectedCategories.slice(0, level);
-    newSelected[level] = value;
-    setSelectedCategories(newSelected);
-    setPage(1);
-    // Scroll to top of filter bar for better UX
-    setTimeout(() => {
-      const filterBar = document.querySelector('.filter-bar');
-      if (filterBar) {
-        filterBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 0);
-  };
-
-  // Helper to get children for a given level
-  const getCategoryChildren = (level) => {
+  // Helper to get current menu categories
+  const getCurrentMenuCategories = () => {
+    if (!categoryMenuStack.length) return categories;
     let node = { children: categories };
-    for (let i = 0; i < level; i++) {
-      const found = (node.children || []).find(c => c.name === selectedCategories[i]);
+    for (let i = 0; i < categoryMenuStack.length; i++) {
+      const found = (node.children || []).find(c => c.name === categoryMenuStack[i]);
       if (!found) return [];
       node = found;
     }
     return node.children || [];
+  };
+
+  // Handler for clicking a category in the menu
+  const handleCategoryMenuClick = (cat) => {
+    const currentLevel = getCurrentMenuCategories();
+    const found = currentLevel.find(c => c.name === cat);
+    if (found && found.children && found.children.length) {
+      setCategoryMenuStack([...categoryMenuStack, cat]);
+    } else {
+      // It's a leaf: apply filter
+      const newSelected = [...categoryMenuStack, cat];
+      setSelectedCategories(newSelected);
+      setCategoryMenuOpen(false);
+      setCategoryMenuStack([]);
+      setPage(1);
+    }
+  };
+
+  // Handler for back button in menu
+  const handleCategoryMenuBack = () => {
+    setCategoryMenuStack(stack => stack.slice(0, -1));
+  };
+
+  // Handler for opening menu
+  const openCategoryMenu = () => setCategoryMenuOpen(true);
+  // Handler for closing menu
+  const closeCategoryMenu = () => {
+    setCategoryMenuOpen(false);
+    setCategoryMenuStack([]);
   };
 
   // Helper to get minutes left until offer expires
@@ -223,52 +241,155 @@ function App() {
 
   return (
     <div className="App">
-      <header className="header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
+      <header className="header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', borderRadius: '8px 8px 0 0', maxWidth: 1024, margin: '0 auto', width: '100%' }}>
         <h1 style={{ margin: 0, textAlign: 'center', width: '100%' }}>Ersatzteil Preisrechner</h1>
       </header>
-      <div className="filter-bar">
+      {/* Hero/Intro Section */}
+      <section className="hero-intro" style={{
+        background: `linear-gradient(rgba(44, 62, 80, 0.7), rgba(44, 62, 80, 0.7)), url('https://images.unsplash.com/photo-1579412690850-bd41cd0af56d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover`,
+        color: 'white',
+        padding: '0.8rem 1rem',
+        borderRadius: '0 0 8px 8px',
+        margin: '0 auto',
+        maxWidth: 1024,
+        width: '100%',
+        textAlign: 'center',
+        boxShadow: '0 2px 12px rgba(44,62,80,0.08)'
+      }}>
+        <h2 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', fontWeight: 600 }}>
+          Professionelle Handyreparatur in Köln
+        </h2>
+        <p style={{ fontSize: '0.95rem', maxWidth: 700, margin: '0 auto' }}>
+          Schnell, zuverlässig und günstig. Wir reparieren Ihr Smartphone noch am selben Tag.
+        </p>
+      </section>
+      <div className="filter-bar" style={{ position: 'relative' }}>
+        {/* Hamburger button for category menu */}
+        <button
+          className="category-menu-btn"
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: '0.5em',
+            marginRight: 12,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            fontSize: 24,
+            color: 'white'
+          }}
+          onClick={openCategoryMenu}
+          aria-label="Kategorien anzeigen"
+        >
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        {/* Search input and buttons */}
         <input
           type="text"
           placeholder="Produkte suchen..."
           value={searchInput}
           onChange={e => setSearchInput(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') { handleSearch(e); } }}
+          style={{ flex: 1, minWidth: 200, color: 'black' }}
         />
         <button type="button" onClick={handleSearch}>Suchen</button>
         {searchTerm && (
           <button type="button" onClick={handleClearSearch}>Zurücksetzen</button>
         )}
-        {Array.from({ length: 5 }).map((_, level) => {
-          const options = getCategoryChildren(level);
-          if (!options.length) return null;
-          return (
-            <select
-              key={level}
-              value={selectedCategories[level] || ''}
-              onChange={e => handleCategoryChange(level, e.target.value)}
-            >
-              <option value="">{level === 0 ? 'Kategorie wählen' : 'Unterkategorie wählen'}</option>
-              {options.map(opt => (
-                <option key={opt.name} value={opt.name}>{opt.name}</option>
-              ))}
-            </select>
-          );
-        })}
-        
-        {/* Display user type as a badge if set, but no controls */}
-        {userType && (
-          <div style={{ 
-            marginLeft: 'auto',
-            backgroundColor: '#dff0d8', 
-            color: '#3c763d', 
-            padding: '0.3rem 0.6rem', 
-            borderRadius: '4px',
-            fontSize: '0.9rem',
-            fontWeight: 'bold'
-          }}>
-            {userType === 'dealer' ? 'Händleransicht' : userType}
-            {password && ' (mit Passwort)'}
+        {/* Show selected category path */}
+        {selectedCategories.length > 0 && (
+          <div style={{ marginLeft: 16, color: '#888', fontSize: '0.98em' }}>
+            Kategorie: {selectedCategories.join(' / ')}
+            <button
+              style={{ marginLeft: 8, background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer', fontSize: '1em' }}
+              onClick={() => setSelectedCategories([])}
+              title="Kategorie zurücksetzen"
+            >✕</button>
           </div>
+        )}
+        {/* Slide-in category menu */}
+        {categoryMenuOpen && (
+          <div className="category-menu-overlay" onClick={closeCategoryMenu} />
+        )}
+        <div
+          className={`category-menu${categoryMenuOpen ? ' open' : ''}`}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: categoryMenuOpen ? 0 : '-340px',
+            width: 320,
+            height: '100vh',
+            background: '#fff',
+            boxShadow: '2px 0 16px rgba(44,62,80,0.13)',
+            zIndex: 2000,
+            transition: 'left 0.3s cubic-bezier(.4,0,.2,1)',
+            overflowY: 'auto',
+            padding: '1.5rem 1.2rem 1.2rem 1.2rem',
+            borderRight: '1px solid #e0e4ea',
+            display: categoryMenuOpen ? 'block' : 'none'
+          }}
+          onClick={e => e.stopPropagation()}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: 18 }}>
+            {categoryMenuStack.length > 0 && (
+              <button
+                onClick={handleCategoryMenuBack}
+                style={{ background: 'none', border: 'none', fontSize: 22, marginRight: 8, cursor: 'pointer' }}
+                aria-label="Zurück"
+              >
+                ←
+              </button>
+            )}
+            <span style={{ fontWeight: 600, fontSize: '1.1em' }}>
+              {categoryMenuStack.length === 0 ? 'Kategorien' : categoryMenuStack[categoryMenuStack.length - 1]}
+            </span>
+            <button
+              onClick={closeCategoryMenu}
+              style={{ marginLeft: 'auto', background: 'none', border: 'none', fontSize: 22, cursor: 'pointer' }}
+              aria-label="Schließen"
+            >
+              ✕
+            </button>
+          </div>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+            {getCurrentMenuCategories().map(cat => (
+              <li key={cat.name} style={{ marginBottom: 8 }}>
+                <button
+                  style={{
+                    width: '100%',
+                    background: 'none',
+                    border: 'none',
+                    textAlign: 'left',
+                    fontSize: '1.08em',
+                    color: 'var(--dark-color)',
+                    padding: '0.7em 0.5em',
+                    borderRadius: 6,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    transition: 'background 0.15s',
+                  }}
+                  onClick={() => handleCategoryMenuClick(cat.name)}
+                >
+                  <span style={{ flex: 1 }}>{cat.name}</span>
+                  {cat.children && cat.children.length > 0 && (
+                    <span style={{ color: '#888', fontSize: 18, marginLeft: 8 }}>→</span>
+                  )}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+        {categoryMenuOpen && (
+          <style>{`
+            .category-menu-overlay {
+              position: fixed;
+              top: 0; left: 0; right: 0; bottom: 0;
+              background: rgba(44,62,80,0.18);
+              z-index: 1999;
+            }
+            .category-menu.open { display: block !important; }
+          `}</style>
         )}
       </div>
       {error && <div className="error">{error}</div>}
