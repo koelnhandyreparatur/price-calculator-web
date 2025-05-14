@@ -223,11 +223,8 @@ function App() {
 
   return (
     <div className="App">
-      <header className="header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: '1rem' }}>
-        <a href="https://koelnhandyreparatur.de/" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block' }}>
-          <img src={logo} alt="Köln Handyreparatur Logo" style={{ height: '70px', verticalAlign: 'middle' }} />
-        </a>
-        <h1 style={{ margin: 0 }}>Ersatzteil Preisrechner</h1>
+      <header className="header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
+        <h1 style={{ margin: 0, textAlign: 'center', width: '100%' }}>Ersatzteil Preisrechner</h1>
       </header>
       <div className="filter-bar">
         <input
@@ -380,6 +377,34 @@ function App() {
           />
         </div>
       )}
+      <footer className="footer" style={{
+        marginTop: '2rem',
+        background: 'var(--primary-color)',
+        color: '#fff',
+        padding: '2rem 1rem',
+        borderRadius: '0 0 8px 8px',
+        textAlign: 'center',
+        boxShadow: '0 -2px 8px rgba(0,0,0,0.04)'
+      }}>
+        <div style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+          <strong>Köln Handyreparatur</strong> &mdash; Neusser Str. 278, 50733 Köln<br/>
+          <a href="mailto:info@koelnhandyreparatur.de" style={{ color: '#fff', textDecoration: 'underline', fontWeight: 500 }}>info@koelnhandyreparatur.de</a>
+        </div>
+        <div style={{ margin: '0.5rem 0' }}>
+          <a href="https://koelnhandyreparatur.de/" target="_blank" rel="noopener noreferrer" style={{ color: '#fff', textDecoration: 'none', fontWeight: 500, marginRight: 16 }}>
+            Website
+          </a>
+          <a href="https://wa.me/491733698233" target="_blank" rel="noopener noreferrer" style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6, color: '#25D366', background: '#23272f', borderRadius: 6, padding: '0.3em 0.8em', fontWeight: 500, textDecoration: 'none', boxShadow: '0 1px 4px rgba(25, 118, 210, 0.10)'
+          }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style={{ marginRight: 4 }}><path d="M12.004 2.003c-5.523 0-9.997 4.474-9.997 9.997 0 1.762.464 3.484 1.345 4.997l-1.409 5.151a1 1 0 0 0 1.225 1.225l5.151-1.409a9.963 9.963 0 0 0 4.997 1.345c5.523 0 9.997-4.474 9.997-9.997s-4.474-9.997-9.997-9.997zm0 18.001a7.96 7.96 0 0 1-4.073-1.144l-.29-.172-3.057.837.837-3.057-.172-.29a7.96 7.96 0 0 1-1.144-4.073c0-4.411 3.589-8 8-8s8 3.589 8 8-3.589 8-8 8zm4.425-5.842c-.242-.121-1.434-.707-1.655-.788-.221-.081-.382-.121-.543.121-.161.242-.623.788-.764.949-.141.161-.282.181-.524.06-.242-.121-1.022-.377-1.947-1.202-.72-.642-1.207-1.433-1.35-1.675-.141-.242-.015-.373.106-.494.109-.108.242-.282.363-.423.121-.141.161-.242.242-.403.081-.161.04-.302-.02-.423-.06-.121-.543-1.312-.744-1.797-.196-.471-.396-.406-.543-.414l-.463-.008c-.161 0-.423.06-.646.282-.221.221-.846.827-.846 2.017 0 1.19.866 2.341.986 2.502.121.161 1.703 2.6 4.132 3.543.578.199 1.028.317 1.379.406.579.147 1.106.126 1.523.077.465-.056 1.434-.586 1.637-1.152.202-.566.202-1.051.141-1.152-.06-.101-.221-.161-.463-.282z"/></svg>
+            WhatsApp
+          </a>
+        </div>
+        <div style={{ fontSize: '0.95rem', color: '#b0b3b8', marginTop: 8 }}>
+          © 2023 Köln Handyreparatur - Alle Rechte vorbehalten
+        </div>
+      </footer>
     </div>
   )
 }

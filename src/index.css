@@ -2,7 +2,7 @@
   --primary-color: #2c3e50;
   --secondary-color: #3498db;
   --accent-color: #e74c3c;
-  --light-color: #ecf0f1;
+  --light-color: #e2e2e2;
   --dark-color: #2c3e50;
   font-family: 'Roboto', Arial, sans-serif;
   color-scheme: light;
@@ -63,13 +63,26 @@ button:focus-visible {
 }
 
 .header {
-  background: var(--primary-color);
+  background: var(--primary-color) !important;
   color: #fff;
   padding: 1.5rem 0;
   margin-bottom: 2rem;
   text-align: left;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   border-radius: 8px 8px 0 0;
+}
+
+.header h1 {
+  background: var(--primary-color) !important;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0.5em 1.5em;
+  text-align: center;
+  width: 100%;
+  margin: 0 auto;
+  font-size: 2rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .product-list-container {
