@@ -35,6 +35,19 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchInput, setSearchInput] = useState('')
 
+  const [userType, setUserType] = useState('');
+  const [password, setPassword] = useState('');
+
+  // Read URL parameters for userType and password on mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const typeParam = urlParams.get('userType');
+    const passParam = urlParams.get('password');
+    
+    if (typeParam) setUserType(typeParam);
+    if (passParam) setPassword(passParam);
+  }, []);
+
   // Fetch categories on mount
   useEffect(() => {
     fetch(CATEGORIES_API)
@@ -63,19 +76,60 @@ function App() {
       .finally(() => setFetchingProducts(false))
   }, [searchTerm, categoryQuery])
 
-  const handleCreateOffer = async (id) => {
-    setLoading(true)
-    setError(null)
-    try {
-      const res = await fetch(`${PRICE_API}${id}`)
-      const data = await res.json()
-      setPrices((prev) => ({ ...prev, [id]: data }))
-    } catch (err) {
-      setError('Failed to fetch price')
-    } finally {
-      setLoading(false)
+  // Update UI to show the current mode
+  useEffect(() => {
+    // When userType changes, clear any cached prices to force re-fetching
+    // This ensures we get the correct price level for the current user type
+    setPrices({});
+    
+    // If we're in dealer mode with URL params, make sure the UI reflects that
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('userType')) {
+      document.title = `Preisrechner (${urlParams.get('userType')})`;
+    } else {
+      document.title = 'Ersatzteil Preisrechner';
     }
-  }
+  }, [userType]);
+
+  // Helper to create API URL with correct parameters
+  const getApiUrlWithParams = (baseUrl, id) => {
+    let url = `${baseUrl}${id}`;
+    
+    if (userType || password) {
+      url += '&';
+      const params = [];
+      if (userType) params.push(`userType=${encodeURIComponent(userType)}`);
+      if (password) params.push(`password=${encodeURIComponent(password)}`);
+      url += params.join('&');
+    }
+    
+    return url;
+  };
+
+  // Update handleCreateOffer to use the helper function
+  const handleCreateOffer = async (id) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const url = getApiUrlWithParams(PRICE_API, id);
+      console.log('Fetching price with URL:', url);
+      
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error(`HTTP error! Status: ${res.status}`);
+      }
+      
+      const data = await res.json();
+      console.log('Price data received:', data);
+      
+      setPrices((prev) => ({ ...prev, [id]: data }));
+    } catch (err) {
+      console.error('Error fetching price:', err);
+      setError(`Failed to fetch price: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Helper to handle image fallback
   const handleImgError = (e) => {
@@ -203,6 +257,22 @@ function App() {
             </select>
           );
         })}
+        
+        {/* Display user type as a badge if set, but no controls */}
+        {userType && (
+          <div style={{ 
+            marginLeft: 'auto',
+            backgroundColor: '#dff0d8', 
+            color: '#3c763d', 
+            padding: '0.3rem 0.6rem', 
+            borderRadius: '4px',
+            fontSize: '0.9rem',
+            fontWeight: 'bold'
+          }}>
+            {userType === 'dealer' ? 'Händleransicht' : userType}
+            {password && ' (mit Passwort)'}
+          </div>
+        )}
       </div>
       {error && <div className="error">{error}</div>}
       {fetchingProducts && <div className="loading">Produkte werden geladen...</div>}
@@ -220,23 +290,58 @@ function App() {
             />
             <div className="product-name">{product.name}</div>
             <button onClick={() => handleCreateOffer(product.id)} disabled={loading} style={{ marginTop: '0.5rem' }}>
-              {loading ? 'Lädt...' : 'Neues Angebot erstellen'}
+              {loading ? 'Lädt...' : 'Preise anzeigen'}
             </button>
             <div className="product-price-info">
-              {prices[product.id]
-                ? prices[product.id].error === 'No provider cost found for product id ' + product.id
-                  ? <div style={{ color: 'red', fontWeight: 'bold' }}>Out of stock!</div>
-                  : <div>
-                      <div>Kunde: {prices[product.id].customer_price}€</div>
+              {prices[product.id] ? (
+                prices[product.id].error === 'No provider cost found for product id ' + product.id ? (
+                  <div style={{ color: 'red', fontWeight: 'bold' }}>Out of stock!</div>
+                ) : (
+                  <div>
+                    <div>Kunde: {prices[product.id].customer_price}€</div>
+                    
+                    {/* Show dealer price if available */}
+                    {prices[product.id].dealer_price && (
                       <div>Händler: {prices[product.id].dealer_price}€</div>
-                      <div>Anbieter: {prices[product.id].provider}</div>
-                      {prices[product.id].expire_time_ms && (
-                        <div style={{ color: '#e67e22', fontWeight: 500, marginTop: 4 }}>
-                          Angebot läuft ab in {getMinutesLeft(prices[product.id].expire_time_ms)} Minuten
-                        </div>
-                      )}
-                    </div>
-                : '-'}
+                    )}
+                    
+                    <div>Anbieter: {prices[product.id].provider}</div>
+                    
+                    {/* Show detailed provider info if available */}
+                    {prices[product.id].all_providers && (
+                      <div style={{ marginTop: '10px', textAlign: 'left' }}>
+                        <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>Alle Anbieter:</div>
+                        <table style={{ width: '100%', fontSize: '0.9em', borderCollapse: 'collapse' }}>
+                          <thead>
+                            <tr>
+                              <th style={{ textAlign: 'left', padding: '2px 5px' }}>Anbieter</th>
+                              <th style={{ textAlign: 'right', padding: '2px 5px' }}>EK</th>
+                              <th style={{ textAlign: 'right', padding: '2px 5px' }}>Händler</th>
+                              <th style={{ textAlign: 'right', padding: '2px 5px' }}>Kunde</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {Object.entries(prices[product.id].all_providers).map(([provider, priceInfo]) => (
+                              <tr key={provider}>
+                                <td style={{ textAlign: 'left', padding: '2px 5px' }}>{provider}</td>
+                                <td style={{ textAlign: 'right', padding: '2px 5px' }}>{priceInfo.cost}€</td>
+                                <td style={{ textAlign: 'right', padding: '2px 5px' }}>{priceInfo.dealer_price}€</td>
+                                <td style={{ textAlign: 'right', padding: '2px 5px' }}>{priceInfo.customer_price}€</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                    
+                    {prices[product.id].expire_time_ms && (
+                      <div style={{ color: '#e67e22', fontWeight: 500, marginTop: 4 }}>
+                        Angebot läuft ab in {getMinutesLeft(prices[product.id].expire_time_ms)} Minuten
+                      </div>
+                    )}
+                  </div>
+                )
+              ) : '-'}
             </div>
           </div>
         ))}
