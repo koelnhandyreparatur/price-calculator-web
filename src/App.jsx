@@ -286,7 +286,12 @@ function App() {
               onClick={() => setModalImg(`/images/${product.id}.jpg`)}
             />
             <div className="product-name">{product.name}</div>
-            <button onClick={() => handleCreateOffer(product.id)} disabled={loading} style={{ marginTop: '0.5rem' }}>
+            <button
+              className="action-btn"
+              onClick={() => handleCreateOffer(product.id)}
+              disabled={loading}
+              style={{ marginTop: '0.5rem' }}
+            >
               {loading ? 'Lädt...' : 'Preise anzeigen'}
             </button>
             <div className="product-price-info">
@@ -336,6 +341,18 @@ function App() {
                         Angebot läuft ab in {getMinutesLeft(prices[product.id].expire_time_ms)} Minuten
                       </div>
                     )}
+                    {/* WhatsApp order button */}
+                    <a
+                      className="action-btn"
+                      href={`https://wa.me/491733698233?text=${encodeURIComponent('Ich möchte ' + product.name + ' bestellen')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"                     
+                      onMouseOver={e => { e.currentTarget.style.background = 'var(--secondary-color)'; }}
+                      onMouseOut={e => { e.currentTarget.style.background = 'var(--primary-color)'; }}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#25D366" viewBox="0 0 24 24" style={{ marginRight: 4 }}><path d="M12.004 2.003c-5.523 0-9.997 4.474-9.997 9.997 0 1.762.464 3.484 1.345 4.997l-1.409 5.151a1 1 0 0 0 1.225 1.225l5.151-1.409a9.963 9.963 0 0 0 4.997 1.345c5.523 0 9.997-4.474 9.997-9.997s-4.474-9.997-9.997-9.997zm0 18.001a7.96 7.96 0 0 1-4.073-1.144l-.29-.172-3.057.837.837-3.057-.172-.29a7.96 7.96 0 0 1-1.144-4.073c0-4.411 3.589-8 8-8s8 3.589 8 8-3.589 8-8 8zm4.425-5.842c-.242-.121-1.434-.707-1.655-.788-.221-.081-.382-.121-.543.121-.161.242-.623.788-.764.949-.141.161-.282.181-.524.06-.242-.121-1.022-.377-1.947-1.202-.72-.642-1.207-1.433-1.35-1.675-.141-.242-.015-.373.106-.494.109-.108.242-.282.363-.423.121-.141.161-.242.242-.403.081-.161.04-.302-.02-.423-.06-.121-.543-1.312-.744-1.797-.196-.471-.396-.406-.543-.414l-.463-.008c-.161 0-.423.06-.646.282-.221.221-.846.827-.846 2.017 0 1.19.866 2.341.986 2.502.121.161 1.703 2.6 4.132 3.543.578.199 1.028.317 1.379.406.579.147 1.106.126 1.523.077.465-.056 1.434-.586 1.637-1.152.202-.566.202-1.051.141-1.152-.06-.101-.221-.161-.463-.282z"/></svg>
+                      Bestellen
+                    </a>
                   </div>
                 )
               ) : '-'}

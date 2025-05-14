@@ -160,3 +160,31 @@ button:focus-visible {
     font-size: 1.3rem;
   }
 }
+
+.action-btn {
+  display: inline-block;
+  min-width: 180px;
+  max-height: 40px;
+  min-height: 40px;
+  padding: 0.48em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background: var(--primary-color);
+  color: #fff;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+  box-sizing: border-box;
+}
+.action-btn:hover, .action-btn:focus {
+  background: var(--secondary-color);
+  outline: none;
+}
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
