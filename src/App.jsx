@@ -16,6 +16,15 @@ const PLACEHOLDER_IMG = '/images/thumbnail.jpg'
 
 const PAGE_SIZE = 15; // 3 columns x 5 rows
 
+// Define image mapping for categories
+const PRODUCT_IMAGES = {
+  'Apple_Display': '/images/iphonescreen.jpg',
+  'Apple_Akku': '/images/iphonebattery.jpg',
+  'Samsung_Display': '/images/samsungscreen.jpg',
+  'Samsung_Akku': '/images/samsungbattery.jpg',
+  'default': '/images/thumbnail.jpg',
+};
+
 function App() {
   const [products, setProducts] = useState([])
   const [prices, setPrices] = useState({})
@@ -239,6 +248,21 @@ function App() {
     return Math.ceil(diffMs / 60000);
   };
 
+  // Helper to get the right image for a product
+  function getProductImage(product) {
+    const brand = product.category2;
+    const type = product.category5;
+    if (brand === 'Apple') {
+      if (type && type.includes('Display')) return PRODUCT_IMAGES['Apple_Display'];
+      if (type && type.includes('Akku')) return PRODUCT_IMAGES['Apple_Akku'];
+    }
+    if (brand === 'Samsung') {
+      if (type && type.includes('Display')) return PRODUCT_IMAGES['Samsung_Display'];
+      if (type && type.includes('Akku')) return PRODUCT_IMAGES['Samsung_Akku'];
+    }
+    return PRODUCT_IMAGES['default'];
+  }
+
   return (
     <div className="App">
       <header className="header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', borderRadius: '8px 8px 0 0', maxWidth: 1024, margin: '0 auto', width: '100%' }}>
@@ -398,13 +422,12 @@ function App() {
         {pagedProducts.map((product) => (
           <div className="product-card" key={product.id}>
             <img
-              src={`/images/${product.id}.jpg`}
+              src={getProductImage(product)}
               alt={product.name || 'Produktbild'}
               className="product-img-large"
               onError={handleImgError}
               loading="lazy"
-              style={{ cursor: 'pointer' }}
-              onClick={() => setModalImg(`/images/${product.id}.jpg`)}
+              style={{ cursor: 'default', pointerEvents: 'none' }}
             />
             <div className="product-name">{product.name}</div>
             <button
